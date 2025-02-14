@@ -1,21 +1,13 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button } from 'react-native';
 
 const ConfirmScreen = ({ navigation }) => {
-  return (
-    <View style={styles.container}>
-      <Text>Confirm Your Booking</Text>
-      <Button title="Confirm" onPress={() => navigation.navigate('Home')} />
-    </View>
-  );
+    return (
+        <View>
+            <Text>Confirmation Screen</Text>
+            <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
+        </View>
+    );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
-
-export default ConfirmScreen;
+export default ConfirmScreen; // Ensure it's exported correctly

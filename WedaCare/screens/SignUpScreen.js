@@ -1,20 +1,32 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { login } from '../api';
+import { signup } from '../api';
 
-const LoginScreen = ({ navigation }) => {
+const SignupScreen = ({ navigation }) => {
+  const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleLogin = async () => {
-    const response = await login({ mobile, password });
-    if (response.token) navigation.navigate('Home');
+  const handleSignup = async () => {
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    const response = await signup({ name, mobile, password });
+    if (response.message) navigation.navigate('Login');
     else alert(response.error);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Sign Up</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        onChangeText={setName}
+      />
       <TextInput
         style={styles.input}
         placeholder="Mobile"
@@ -27,8 +39,13 @@ const LoginScreen = ({ navigation }) => {
         secureTextEntry
         onChangeText={setPassword}
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Sign Up" onPress={() => navigation.navigate('Signup')} />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        secureTextEntry
+        onChangeText={setConfirmPassword}
+      />
+      <Button title="Sign Up" onPress={handleSignup} />
     </View>
   );
 };
@@ -57,5 +74,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
-
+export default SignupScreen;

@@ -4,7 +4,7 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 const StartScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text>Welcome to Suwasariya</Text>
+      <Text>Welcome to WedaCare</Text>
       <Button title="Start" onPress={() => navigation.navigate('Language')} />
     </View>
   );
@@ -19,3 +19,4 @@ const styles = StyleSheet.create({
 });
 
 export default StartScreen;
+

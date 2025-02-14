@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import StartScreen from './screens/StartScreen';
 import LanguageScreen from './screens/LanguageScreen';
 import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignUpScreen'; 
 import HomeScreen from './screens/HomeScreen';
 import BookingScreen from './screens/BookingScreen';
 import ConfirmScreen from './screens/ConfirmScreen';
@@ -17,6 +18,7 @@ export default function App() {
         <Stack.Screen name="Start" component={StartScreen} />
         <Stack.Screen name="Language" component={LanguageScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Signup" component={SignupScreen} /> 
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Booking" component={BookingScreen} />
         <Stack.Screen name="Confirm" component={ConfirmScreen} />
