@@ -10,4 +10,4 @@ const ConfirmScreen = ({ navigation }) => {
     );
 };
 
-export default ConfirmScreen; // Ensure it's exported correctly
+export default ConfirmScreen; 
