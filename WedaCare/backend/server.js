@@ -29,7 +29,6 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 
 // Start Server
-const PORT = process.env.PORT || 5001;
-const HOST = process.env.HOST || '0.0.0.0';
+//const PORT = process.env.PORT || 5001;
+app.listen(5001, '0.0.0.0', () => console.log(`✅ Server running on port 5001`));
 
-app.listen(PORT, HOST, () => console.log(`✅ Server running at http://${HOST}:${PORT}`));
