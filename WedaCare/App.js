@@ -9,6 +9,7 @@ import HomeScreen from './screens/HomeScreen';
 import BookingScreen from './screens/BookingScreen';
 import ConfirmScreen from './screens/ConfirmScreen';
 import DateTimeSelectionScreen from './screens/DateTimeSelectionScreen';
+import LocationSelectionScreen from "./screens/LocationSelectionScreen";
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Booking" component={BookingScreen} />
         <Stack.Screen name="DateTimeSelection" component={DateTimeSelectionScreen} />
+        <Stack.Screen name="LocationSelection" component={LocationSelectionScreen} />
         <Stack.Screen name="Confirm" component={ConfirmScreen} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -1,65 +1,129 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
-import axios from "axios";  
+import React, { useState, useEffect } from "react";
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  Alert, 
+  ScrollView 
+} from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import MapView, { Marker } from "react-native-maps";
+import axios from "axios";
 
-const API_URL = 'http://192.168.1.8:5001/api/auth'; 
+const API_URL = 'http://192.168.1.8:5001/api';
 
 const ConfirmScreen = ({ route, navigation }) => {
-  const { serviceType, selectedDate } = route.params;
+  const { serviceType, selectedDate, location } = route.params;
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://192.168.1.8:5001/api/user-details'); 
-        console.log("✅ User data fetched:", response.data); 
+        const storedMobile = await AsyncStorage.getItem('userMobile');
+
+        if (!storedMobile) {
+          Alert.alert("Error", "User not logged in.");
+          navigation.navigate('Login');
+          return;
+        }
+
+        const response = await axios.get(`${API_URL}/user-details/${storedMobile}`);
+        console.log("✅ User data fetched:", response.data);
         setUserData(response.data);
-      } catch (error) {
-        Alert.alert("Error", "Failed to fetch user details.");
+      } catch (err) {
+        console.error("❌ Error fetching user data:", err?.response?.data || err.message);
+        setError("Failed to fetch user details. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [navigation]);
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#E2443B" />
       </View>
     );
   }
 
+  if (error) {
+    return (
+      <View style={styles.fullContainer}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{String(error)}</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <View style={styles.fullContainer}>
+        <View style={styles.container}>
+          <Text style={styles.errorText}>User data not available.</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Appointment Confirmation</Text>
+    <View style={styles.fullContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Appointment Confirmation</Text>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Name:</Text>
-        <Text style={styles.value}>{userData?.name || "N/A"}</Text>
-      </View>
+          {/* User Details */}
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Name:</Text>
+            <Text style={styles.value}>{userData.name}</Text>
+          </View>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Mobile:</Text>
-        <Text style={styles.value}>{userData?.mobile || "N/A"}</Text>
-      </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Mobile:</Text>
+            <Text style={styles.value}>{userData.mobile}</Text>
+          </View>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Service Type:</Text>
-        <Text style={styles.value}>{serviceType}</Text>
-      </View>
+          {/* Service & Date */}
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Service Type:</Text>
+            <Text style={styles.value}>{serviceType}</Text>
+          </View>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Date & Time:</Text>
-        <Text style={styles.value}>{new Date(selectedDate).toLocaleString()}</Text>
-      </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Date & Time:</Text>
+            <Text style={styles.value}>{new Date(selectedDate).toLocaleString()}</Text>
+          </View>
 
-      <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.btnText}>Finish</Text>
-      </TouchableOpacity>
+          {/* Map Displaying Location */}
+          {location && location.latitude && location.longitude ? (
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+              }}
+            >
+              <Marker coordinate={location} title="Selected Location" />
+            </MapView>
+          ) : (
+            <Text style={styles.noLocation}>No location selected</Text>
+          )}
+
+          {/* Finish Button */}
+          <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate("Home")}>
+            <Text style={styles.btnText}>Finish</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -67,50 +131,85 @@ const ConfirmScreen = ({ route, navigation }) => {
 export default ConfirmScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  fullContainer: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
     backgroundColor: "#121212",
   },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "flex-start",
+    paddingBottom: 20,
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+    alignItems: "center",
+  },
   title: {
-    fontSize: 25,
-    fontFamily: "Montserrat_700Bold",
+    fontSize: 24,
+    fontWeight: "bold",
     color: "#FFF",
     marginBottom: 20,
+    textAlign: "center",
   },
   infoContainer: {
     flexDirection: "row",
-    width: "80%",
     justifyContent: "space-between",
+    width: "90%",
     marginBottom: 10,
     padding: 10,
-    backgroundColor: "#333",
-    borderRadius: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#444",
   },
   label: {
-    fontSize: 18,
-    fontFamily: "Montserrat_600SemiBold",
-    color: "#AAA",
+    fontWeight: "bold",
+    color: "#E2443B",
+    fontSize: 16,
   },
   value: {
-    fontSize: 18,
-    fontFamily: "Montserrat_400Regular",
     color: "#FFF",
+    fontSize: 16,
+  },
+  map: {
+    width: "100%",
+    height: 300,
+    marginTop: 20,
+    borderRadius: 10,
+  },
+  noLocation: {
+    fontSize: 16,
+    color: "#BBB",
+    marginTop: 20,
   },
   btn: {
     backgroundColor: "#E2443B",
-    paddingHorizontal: 40,
-    paddingVertical: 12,
-    borderRadius: 30,
-    marginVertical: 20,
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
     width: "80%",
     alignItems: "center",
   },
   btnText: {
-    fontFamily: "Montserrat_600SemiBold",
-    fontSize: 18,
     color: "#FFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#121212",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#121212',
+    padding: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
-

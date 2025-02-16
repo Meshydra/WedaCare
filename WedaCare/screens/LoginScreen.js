@@ -8,6 +8,7 @@ import {
   Image,
 } from "react-native";
 import Icon from "@expo/vector-icons/AntDesign";
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import { login } from "../api";
 
 const LoginScreen = ({ navigation }) => {
@@ -19,6 +20,10 @@ const LoginScreen = ({ navigation }) => {
     try {
       console.log("🚀 Login button clicked");
       const response = await login(mobile, password);
+      if (response.message === "Login successful") {
+        await AsyncStorage.setItem('userMobile', mobile); 
+        navigation.navigate('Confirm', { /* other params */ }); 
+      }
       console.log("✅ Login success:", response);
       navigation.navigate("Home");
     } catch (err) {

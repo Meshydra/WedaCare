@@ -31,3 +31,27 @@ export const login = async (mobile, password) => {
         throw error;
     }
 };
+
+// Function to update user location
+export const updateLocation = async (mobile, latitude, longitude) => {
+    try {
+        const response = await axios.post(`${API_URL}/update-location`, { mobile, latitude, longitude });
+        console.log("✅ Location updated:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("❌ Error updating location:", error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+// Function to get user location
+export const getLocation = async (mobile) => {
+    try {
+        const response = await axios.get(`${API_URL}/get-location/${mobile}`);
+        console.log("📍 Fetched location:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("❌ Error fetching location:", error.response ? error.response.data : error.message);
+        throw error;
+    }
+};

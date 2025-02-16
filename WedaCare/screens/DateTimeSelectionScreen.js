@@ -8,8 +8,11 @@ const DateTimeSelectionScreen = ({ route, navigation }) => {
   const [showPicker, setShowPicker] = useState(false);
 
   const handleConfirm = () => {
-    navigation.navigate("Confirm", { serviceType, selectedDate: date });
-  };
+    navigation.navigate("LocationSelection", { 
+        serviceType, 
+        selectedDate: date.toISOString()  
+    });
+};
 
   return (
     <View style={styles.container}>

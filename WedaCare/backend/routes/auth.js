@@ -9,7 +9,7 @@ router.post('/signup', async (req, res) => {
     const { name, mobile, password, language } = req.body;
 
     if (!name || !mobile || !password || !language) {
-        console.log("⚠️ Missing fields:", req.body);
+        console.log("Missing fields:", req.body);
         return res.status(400).json({ error: "All fields are required" });
     }
 
@@ -59,6 +59,62 @@ router.post('/login', async (req, res) => {
         res.status(200).json({ message: "Login successful" });
     } catch (error) {
         console.error("❌ Error during login:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+router.get('/user-details/:mobile', async (req, res) => {
+    const { mobile } = req.params;
+
+    try {
+        const user = await User.findOne({ mobile });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json(user); // Send the complete user object
+    } catch (error) {
+        console.error("❌ Error fetching user details:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+router.post('/update-location', async (req, res) => {
+    const { mobile, latitude, longitude } = req.body;
+
+    if (!mobile || latitude == null || longitude == null) {
+        return res.status(400).json({ error: "Mobile, latitude, and longitude are required" });
+    }
+
+    try {
+        const user = await User.findOne({ mobile });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Update location
+        user.location = { latitude, longitude };
+        await user.save();
+
+        res.status(200).json({ message: "Location updated successfully", location: user.location });
+    } catch (error) {
+        console.error("❌ Error updating location:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+router.get('/get-location/:mobile', async (req, res) => {
+    const { mobile } = req.params;
+
+    try {
+        const user = await User.findOne({ mobile });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ location: user.location || "No location data available" });
+    } catch (error) {
+        console.error("❌ Error fetching location:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });

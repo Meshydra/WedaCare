@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Your location is needed to select a service location",
+        "NSLocationAlwaysUsageDescription": "We need your location to provide better service"
+      }
     },
     "android": {
       "adaptiveIcon": {
